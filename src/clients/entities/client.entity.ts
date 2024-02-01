@@ -1,6 +1,15 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Delivery } from './delivery.entity';
 import { Employee } from './employee.entity';
+import { Record } from 'src/records/entities/record.entity';
 
 @Entity()
 export class Client {
@@ -10,7 +19,7 @@ export class Client {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   cpf: string;
 
   @Column()
@@ -27,4 +36,7 @@ export class Client {
 
   @OneToOne(() => Delivery, (delivery) => delivery.client)
   delivery: Delivery;
+
+  @OneToMany(() => Record, (record) => record.client)
+  records: Record[];
 }

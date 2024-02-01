@@ -15,4 +15,8 @@ describe('VehiclesService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  it('should return an array of vehicles', () => {
+    const result = service.findByPlate('ABC-1234');
+    expect(result).toBeInstanceOf(Array);
+  });
 });

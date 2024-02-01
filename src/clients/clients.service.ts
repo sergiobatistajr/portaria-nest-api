@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { Repository } from 'typeorm';
+import { ILike, QueryFailedError, Repository } from 'typeorm';
 import { Client } from './entities/client.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
 import { Delivery } from './entities/delivery.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { CLIENT_DELIVERY, CLIENT_EMPLOYEE } from './clients.constant';
+import { CLIENT_DELIVERY, CLIENT_EMPLOYEE } from './clients.constants';
+import { CreateDeliveryDto } from './dto/create-delivery.dto';
 
 @Injectable()
 export class ClientsService {
@@ -20,49 +21,62 @@ export class ClientsService {
   ) {}
 
   async create(createClientDto: CreateClientDto) {
-    const client = await this.clientsRepository.save(createClientDto);
-    if (client.clientType === CLIENT_EMPLOYEE) {
-      const employee = await this.createEmployee({
-        clientId: client.id,
-        jobTitle: createClientDto?.jobTitle,
-        sector: createClientDto?.sector,
-      });
-      return {
-        ...client,
-        ...employee,
-      };
-    }
-    if (client.clientType === CLIENT_DELIVERY) {
-      const delivery = await this.createDelivery({
-        clientId: client.id,
-        company: createClientDto?.company,
-      });
-      return {
-        ...client,
-        ...delivery,
-      };
-    }
+    try {
+      const client = await this.clientsRepository.save(createClientDto);
+      if (client.clientType === CLIENT_EMPLOYEE) {
+        const employee = await this.createEmployee({
+          clientId: client.id,
+          jobTitle: createClientDto?.jobTitle,
+          sector: createClientDto?.sector,
+        });
+        return {
+          ...client,
+          ...employee,
+        };
+      }
+      if (client.clientType === CLIENT_DELIVERY) {
+        const delivery = await this.createDelivery({
+          clientId: client.id,
+          company: createClientDto?.company,
+        });
+        return {
+          ...client,
+          ...delivery,
+        };
+      }
 
-    return client;
+      return client;
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        return {
+          message: ['Client already exists'],
+          statusCode: HttpStatus.CONFLICT,
+          error: error.message,
+        };
+      }
+      throw error;
+    }
   }
 
-  async createEmployee(createEmployeeDto: CreateEmployeeDto) {
+  private async createEmployee(createEmployeeDto: CreateEmployeeDto) {
     return this.employeesRepository.save(createEmployeeDto);
   }
 
-  async createDelivery(delivery: { clientId: string; company: string }) {
+  private async createDelivery(delivery: CreateDeliveryDto) {
     return this.deliveriesRepository.save(delivery);
   }
 
-  findAll() {
-    return `This action returns all clients`;
+  async findByCpf(cpf: string) {
+    return await this.clientsRepository.find({
+      where: { cpf: ILike(`%${cpf}%`) },
+      relations: {
+        employee: true,
+        delivery: true,
+      },
+    });
   }
 
-  findOne(name: string) {
-    return `This action returns a #${name} client`;
-  }
-
-  update(id: string, updateClientDto: UpdateClientDto) {
-    return `This action updates a #${id} client`;
+  async update(id: string, updateClientDto: UpdateClientDto) {
+    return await this.clientsRepository.update(id, updateClientDto);
   }
 }

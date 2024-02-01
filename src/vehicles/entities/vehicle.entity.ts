@@ -1,11 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Record } from 'src/records/entities/record.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Vehicle {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   plate: string;
 
   @Column()
@@ -16,4 +17,7 @@ export class Vehicle {
 
   @Column()
   color: string;
+
+  @OneToMany(() => Record, (record) => record.client)
+  records: Record[];
 }

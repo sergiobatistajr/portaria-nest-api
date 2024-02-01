@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -12,10 +12,21 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.usersRepository.save(createUserDto);
+    try {
+      return await this.usersRepository.save(createUserDto);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        return {
+          message: ['User already exists'],
+          statusCode: HttpStatus.CONFLICT,
+          error: error.message,
+        };
+      }
+      throw error;
+    }
   }
 
-  async find(username: string) {
+  async findOne(username: string) {
     return await this.usersRepository.findOneOrFail({ where: { username } });
   }
 

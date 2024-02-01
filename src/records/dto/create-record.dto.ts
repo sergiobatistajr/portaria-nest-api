@@ -1,4 +1,10 @@
-import { IsDateString, IsNumber, IsString, IsUUID } from 'class-validator';
+import {
+  IsDateString,
+  IsNumber,
+  IsString,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
 
 export class CreateRecordDto {
   @IsDateString()
@@ -7,24 +13,35 @@ export class CreateRecordDto {
   @IsUUID()
   clientId: string;
 
+  @ValidateIf(
+    (record) => record.vehicleId !== undefined && record.vehicleId !== null,
+  )
   @IsUUID()
-  vehicleId: string;
+  vehicleId?: string;
 
   @IsUUID()
   createdBy: string;
 
-  @IsDateString()
-  exitDate?: string;
-
+  @ValidateIf(
+    (record) => record.apartment !== undefined && record.apartment !== null,
+  )
   @IsNumber()
   apartment?: number;
 
+  @ValidateIf((record) => record.event !== undefined && record.event !== null)
   @IsString()
   event?: string;
 
+  @ValidateIf(
+    (record) => record.location !== undefined && record.location !== null,
+  )
   @IsString()
   location?: string;
 
+  @ValidateIf(
+    (record) =>
+      record.observations !== undefined && record.observations !== null,
+  )
   @IsString()
   observations?: string;
 }

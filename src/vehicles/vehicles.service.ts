@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, QueryFailedError, Repository } from 'typeorm';
 import { Vehicle } from './entities/vehicle.entity';
 
 @Injectable()
@@ -11,11 +11,24 @@ export class VehiclesService {
     @InjectRepository(Vehicle) private vehiclesRepository: Repository<Vehicle>,
   ) {}
   async create(createVehicleDto: CreateVehicleDto) {
-    return await this.vehiclesRepository.save(createVehicleDto);
+    try {
+      return await this.vehiclesRepository.save(createVehicleDto);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        return {
+          message: ['Vehicle already exists'],
+          statusCode: HttpStatus.CONFLICT,
+          error: error.message,
+        };
+      }
+      throw error;
+    }
   }
 
-  async findOne(plate: string) {
-    return await this.vehiclesRepository.findOneOrFail({ where: { plate } });
+  async findByPlate(plate: string) {
+    return await this.vehiclesRepository.findBy({
+      plate: ILike(`%${plate}%`),
+    });
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {

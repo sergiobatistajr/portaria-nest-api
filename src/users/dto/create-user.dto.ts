@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsString, Length } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -8,6 +8,7 @@ export class CreateUserDto {
   username: string;
 
   @IsString()
+  @Length(8)
   password: string;
 
   @IsBoolean()
