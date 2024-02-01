@@ -1,9 +1,5 @@
 import { IsEnum, IsString, IsUUID, Matches, ValidateIf } from 'class-validator';
-import {
-  CLIENT_DELIVERY,
-  CLIENT_EMPLOYEE,
-  CLIENT_GUEST,
-} from '../clients.constants';
+import { clientConstants } from 'src/constants';
 
 export class CreateClientDto {
   @IsString()
@@ -15,7 +11,11 @@ export class CreateClientDto {
   })
   cpf: string;
 
-  @IsEnum([CLIENT_DELIVERY, CLIENT_GUEST, CLIENT_EMPLOYEE])
+  @IsEnum([
+    clientConstants.guest,
+    clientConstants.employee,
+    clientConstants.delivery,
+  ])
   clientType: string;
 
   @IsUUID()

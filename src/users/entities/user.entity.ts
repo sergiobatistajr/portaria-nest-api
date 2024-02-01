@@ -1,3 +1,4 @@
+import { userConstants } from 'src/constants';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -19,7 +20,7 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'user', 'report'],
+    enum: [userConstants.user, userConstants.admin, userConstants.report],
   })
   role: string;
 }

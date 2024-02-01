@@ -1,8 +1,6 @@
 import {
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +8,7 @@ import {
 import { Delivery } from './delivery.entity';
 import { Employee } from './employee.entity';
 import { Record } from 'src/records/entities/record.entity';
+import { clientConstants } from 'src/constants';
 
 @Entity()
 export class Client {
@@ -27,7 +26,11 @@ export class Client {
 
   @Column({
     type: 'enum',
-    enum: ['employee', 'guest', 'delivery'],
+    enum: [
+      clientConstants.employee,
+      clientConstants.delivery,
+      clientConstants.guest,
+    ],
   })
   clientType: string;
 

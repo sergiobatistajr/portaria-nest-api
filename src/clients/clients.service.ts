@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
 import { Delivery } from './entities/delivery.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { CLIENT_DELIVERY, CLIENT_EMPLOYEE } from './clients.constants';
 import { CreateDeliveryDto } from './dto/create-delivery.dto';
+import { clientConstants } from 'src/constants';
 
 @Injectable()
 export class ClientsService {
@@ -19,11 +19,11 @@ export class ClientsService {
     @InjectRepository(Delivery)
     private deliveriesRepository: Repository<Delivery>,
   ) {}
-
+  // chamar o metodo pela key
   async create(createClientDto: CreateClientDto) {
     try {
       const client = await this.clientsRepository.save(createClientDto);
-      if (client.clientType === CLIENT_EMPLOYEE) {
+      if (client.clientType === clientConstants.employee) {
         const employee = await this.createEmployee({
           clientId: client.id,
           jobTitle: createClientDto?.jobTitle,
@@ -34,7 +34,8 @@ export class ClientsService {
           ...employee,
         };
       }
-      if (client.clientType === CLIENT_DELIVERY) {
+
+      if (client.clientType === clientConstants.delivery) {
         const delivery = await this.createDelivery({
           clientId: client.id,
           company: createClientDto?.company,

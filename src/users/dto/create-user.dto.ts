@@ -1,4 +1,5 @@
 import { IsBoolean, IsEnum, IsString, Length } from 'class-validator';
+import { userConstants } from '../../constants';
 
 export class CreateUserDto {
   @IsString()
@@ -14,6 +15,6 @@ export class CreateUserDto {
   @IsBoolean()
   isActive: boolean;
 
-  @IsEnum(['admin', 'user', 'report'])
+  @IsEnum([userConstants.user, userConstants.admin, userConstants.report])
   role: string;
 }

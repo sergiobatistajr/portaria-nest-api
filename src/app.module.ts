@@ -4,12 +4,11 @@ import { UsersModule } from './users/users.module';
 import { RecordsModule } from './records/records.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Client } from './clients/entities/client.entity';
-import { User } from './users/entities/user.entity';
-import { Record } from './records/entities/record.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     UsersModule,
     ClientsModule,
     RecordsModule,
@@ -21,10 +20,9 @@ import { Record } from './records/entities/record.entity';
       username: 'local_user',
       password: 'local_password',
       database: 'local_db',
-      // entities: [User, Record, Client],
       synchronize: true,
       autoLoadEntities: true,
     }),
   ],
 })
-export class AppModule { }
+export class AppModule {}
