@@ -9,7 +9,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -27,7 +27,7 @@ export class UsersService {
   }
 
   async findOne(username: string) {
-    return await this.usersRepository.findOneOrFail({ where: { username } });
+    return await this.usersRepository.findOne({ where: { username } });
   }
 
   async findById(id: string) {

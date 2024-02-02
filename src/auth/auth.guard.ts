@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.cookie?.split('=') ?? [];
-    return type === 'auth' ? token : undefined;
+    const { access_token } = request.signedCookies;
+    return access_token;
   }
 }
